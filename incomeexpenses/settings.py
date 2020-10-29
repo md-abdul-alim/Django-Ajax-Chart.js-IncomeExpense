@@ -9,8 +9,15 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+# pip install python-decouple
 from pathlib import Path
+from decouple import config
+
+# https://pypi.org/project/django-heroku/
+# pip install django-heroku
+import django_heroku
+
+# pip install gunicorn
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'expenses',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +62,7 @@ ROOT_URLCONF = 'incomeexpenses.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,10 +81,23 @@ WSGI_APPLICATION = 'incomeexpenses.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# visit for settings: https://djangostars.com/blog/configuring-django-settings-best-practices/
+# https://djangostars.com/blog/configuring-django-settings-best-practices/
+# pip install psycopg2
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_USER_PASSWORD'),
+        'HOST': config('DB_HOST'),
     }
 }
 
@@ -118,3 +139,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR/"static_root"
+STATICFILES_DIRS = [
+    BASE_DIR/"static"  # if we keep the static file inside expenseswebsite. than, expenseswebsite/static will base_dir
+]
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR/"static/images"
+django_heroku.settings(locals())  # https://pypi.org/project/django-heroku/
