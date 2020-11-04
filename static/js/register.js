@@ -1,6 +1,7 @@
 const usernameField = document.querySelector('#usernameField');
 const feedBackArea = document.querySelector('.invalid_feedback');
-const usernameSuccessOutput = document.querySelector(".usernameSuccessOutput")
+const usernameSuccessOutput = document.querySelector(".usernameSuccessOutput");
+const submitBtn = document.querySelector('.submitBtn');
 
 usernameField.addEventListener("keyup", (e) =>{
     //console.log('777777',777777);
@@ -24,9 +25,12 @@ usernameField.addEventListener("keyup", (e) =>{
                 usernameSuccessOutput.style.display = "None";
                 if(data.username_error){
                     //this 3 line to show error
+                    submitBtn.disabled = true;
                     usernameField.classList.add("is-invalid");
                     feedBackArea.style.display = "block";
                     feedBackArea.innerHTML = `<p>${data.username_error}</p>`;
+                }else{
+                    submitBtn.removeAttribute("disabled");
                 }
             });
     }
@@ -59,9 +63,12 @@ emailField.addEventListener('keyup',(e)=>{
                 emailSuccessOutput.style.display = "None";
                 if(data.email_error){
                     //this 3 line to show error
+                    submitBtn.disabled = true;
                     emailField.classList.add("is-invalid");
                     emailFeedBackArea.style.display = "block";
                     emailFeedBackArea.innerHTML = `<p>${data.email_error}</p>`;
+                }else{
+                    submitBtn.removeAttribute("disabled");
                 }
             });
     }
@@ -83,3 +90,7 @@ const handleToggleInput = (e) =>{
 };
 
 showPasswordToggle.addEventListener("click", handleToggleInput);
+
+/////////////////////////Registration Validation/////////////////////////////////
+
+
