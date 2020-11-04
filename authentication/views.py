@@ -6,6 +6,7 @@ from django.views import View
 import json
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 # Create your views here.
@@ -27,7 +28,6 @@ class UsernameValidationView(View):
 # this is for froguction: pip install email-validator #https://pypi.org/project/email-validator/
 #from email_validator import validate_email, EmailNotValidError
 # this is for api test: pip install validate_email #https://pypi.org/project/validate_email/#description
-from validate_email import validate_email
 
 
 class EmailValidationView(View):
@@ -42,19 +42,16 @@ class EmailValidationView(View):
 
         return JsonResponse({'email_valid': True})
 
-        # try:
-        #     # Validate.
-        #     valid = validate_email(email)
-
-        #     # Update with the normalized form.
-        #     email = valid.email
-        # except EmailNotValidError as e:
-        #     # email is not valid, exception message is human-readable
-        #     print(str(e))
-        #raise EmailSyntaxError("The email address is not valid. It must have exactly one @-sign.")
-        # email_validator.EmailSyntaxError: The email address is not valid. It must have exactly one @-sign.
-
 
 class RegistrationView(View):
     def get(self, request):
+        return render(request, 'authentication/register.html')
+
+    def post(self, request):
+
+        messages.success(request, 'Success Registration')
+        # messages.warning(request, 'Success Registration warning')
+        # messages.info(request, 'Success Registration info')
+        # messages.error(request, 'Success Registration error')
+
         return render(request, 'authentication/register.html')

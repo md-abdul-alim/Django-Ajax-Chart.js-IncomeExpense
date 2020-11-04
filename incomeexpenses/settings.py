@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 # pip install python-decouple
 from pathlib import Path
 from decouple import config
-
+from django.contrib import messages
 # https://pypi.org/project/django-heroku/
 # pip install django-heroku
 import django_heroku
@@ -149,3 +149,7 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/"static/images"
 django_heroku.settings(locals())  # https://pypi.org/project/django-heroku/
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}

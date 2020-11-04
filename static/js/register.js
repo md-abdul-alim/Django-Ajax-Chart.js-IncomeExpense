@@ -1,9 +1,12 @@
 const usernameField = document.querySelector('#usernameField');
 const feedBackArea = document.querySelector('.invalid_feedback');
+const usernameSuccessOutput = document.querySelector(".usernameSuccessOutput")
 
 usernameField.addEventListener("keyup", (e) =>{
-    console.log('777777',777777);
+    //console.log('777777',777777);
     const usernameVal = e.target.value;
+    usernameSuccessOutput.style.display = "block";
+    usernameSuccessOutput.textContent = `Checking ${usernameVal}`;
 
     //this 2 line to remove error after correcting the username
     usernameField.classList.remove("is-invalid");
@@ -18,6 +21,7 @@ usernameField.addEventListener("keyup", (e) =>{
             .then(res=>res.json())
             .then(data=>{
                 console.log("data", data)
+                usernameSuccessOutput.style.display = "None";
                 if(data.username_error){
                     //this 3 line to show error
                     usernameField.classList.add("is-invalid");
@@ -28,11 +32,16 @@ usernameField.addEventListener("keyup", (e) =>{
     }
 
 });
-//////////////////
+/////////Email Field/////////
 const emailField = document.querySelector("#emailField");
-const emailFeedBackArea = document.querySelector('.emailFeedBackArea')
-emailField.addEventListener('keyup',()=>{
+const emailFeedBackArea = document.querySelector('.emailFeedBackArea');
+const emailSuccessOutput = document.querySelector(".emailSuccessOutput");
+
+emailField.addEventListener('keyup',(e)=>{
     const emailVal = e.target.value;
+
+    emailSuccessOutput.style.display = "block";
+    emailSuccessOutput.textContent = `Checking ${emailVal}`;
 
     //this 2 line to remove error after correcting the email
     emailField.classList.remove("is-invalid");
@@ -47,6 +56,7 @@ emailField.addEventListener('keyup',()=>{
             .then(res=>res.json())
             .then(data=>{
                 console.log("data", data)
+                emailSuccessOutput.style.display = "None";
                 if(data.email_error){
                     //this 3 line to show error
                     emailField.classList.add("is-invalid");
@@ -56,3 +66,20 @@ emailField.addEventListener('keyup',()=>{
             });
     }
 });
+
+///////showPasswordToggle/////////////////////
+const showPasswordToggle = document.querySelector(".showPasswordToggle");
+const passwordField = document.querySelector("#passwordField");
+
+const handleToggleInput = (e) =>{
+    if(showPasswordToggle.textContent == "Show"){
+        showPasswordToggle.textContent = "Hide";
+
+        passwordField.setAttribute("type", "text");
+    }else{
+        showPasswordToggle.textContent = "Show";
+        passwordField.setAttribute("type", "password");
+    }
+};
+
+showPasswordToggle.addEventListener("click", handleToggleInput);

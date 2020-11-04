@@ -10,21 +10,24 @@
                 <div class="card-title py-2">
                     <h4>Register for a free account</h4>
                 </div>
-                <form action="" method="post">
+
+
+                <form action="{% url 'register' %}" method="POST">
                     {% csrf_token %}
+                    {% include 'partials/_messages.html' %}
                     <div class="form-group">
                         <input type="text" name="username" placeholder="Username" id="usernameField" class="form-control form-control-sm"/>
                     </div>
-                    <div class="invalid_feedback invalid-feedback" style="display: none">
-                        
-                    </div>
+                    <div class="invalid_feedback invalid-feedback" style="display: none"></div>
+                    <p class="text-sm text-success usernameSuccessOutput"></p>
                     <div class="form-group">
                         <input type="email" name="email" placeholder="Email" id="emailField" class="form-control  form-control-sm"/>
                     </div>
                     <div class="emailFeedBackArea invalid-feedback" style="display: none"></div>
+                    <p class="text-sm text-success emailSuccessOutput"></p>
                     <div class="form-group">
                         <input type="password" name="password" placeholder="Password" id="passwordField" class="form-control  form-control-sm"/>
-                        <small class="float-right py-2">Show</small>
+                        <small class="float-right py-2 showPasswordToggle">Show</small>
                     </div>
                     <input type="submit" value="Register" class="btn btn-block btn-primary"/>
                 </form>
@@ -36,3 +39,5 @@
 
 <script src="{% static 'js/register.js' %}"></script>
 {% endblock %}
+
+
