@@ -156,7 +156,7 @@ class LoginView(View):
 
             # if user is not registered
             messages.error(
-                request, 'Please verify your account first.Check email.')
+                request, 'Username or Password does not match.')
             return render(request, 'authentication/login.html')
 
         # if user is not registered
@@ -227,4 +227,30 @@ class CompletePasswordReset(View):
             'uidb64': uidb64,
             'token': token
         }
-        return render(request, 'authentication/set-new-password.html', context)
+        password = request.POST['password']
+        password2 = request.POST['password2']
+
+        if password != password2:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'authentication/set-new-password.html', context)
+
+        if len(password) < 3:
+            messages.error(
+                request, 'Password too short. It should be at least 3.')
+            return render(request, 'authentication/set-new-password.html', context)
+
+        try:
+            user_id = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=user_id)
+            if not PasswordResetTokenGenerator().check_token(user, token):
+                messages.info(
+                    request, 'Password link is invalid, please request a new one')
+                return render(request, 'authentication/reset-password.html')
+            else:
+                user.set_password(password)
+                user.save()
+                messages.success(request, 'Password reset successfull')
+                return redirect('login')
+        except Exception as identifier:
+            messages.info(request, 'Something went wrong,try again')
+            return render(request, 'authentication/set-new-password.html', context)
