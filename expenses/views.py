@@ -8,7 +8,7 @@ from .models import Category, Expense
 from django.core.paginator import Paginator
 import json
 from django.http import JsonResponse
-from userpreferences.models import UserPreference
+from userpreferences.models import Currency
 # Create your views here.
 
 
@@ -31,7 +31,11 @@ def dashboard(request):
     paginator = Paginator(expenses, 3)
     page_number = request.GET.get('page')
     page_obj = Paginator.get_page(paginator, page_number)
-    currency = UserPreference.objects.get(user=request.user).currency
+    try:
+        currency = Currency.objects.get(user=request.user).currency
+    except Currency.DoesNotExist:
+        currency = 'Set Currency'
+
     context = {
         # 'categories': categories,
         'expenses': expenses,

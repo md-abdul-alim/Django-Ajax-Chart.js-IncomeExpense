@@ -157,7 +157,8 @@ class LoginView(View):
                 return render(request, 'authentication/login.html')
 
             # if user is not registered
-            messages.error(request, 'Invalid credentials, try again')
+            messages.error(
+                request, 'Please verify your account first.Check email.')
             return render(request, 'authentication/login.html')
 
         # if user is not registered

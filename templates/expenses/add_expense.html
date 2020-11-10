@@ -10,41 +10,40 @@
     </nav>
 
     
-<div class="card">
-    <div class="card-body">
-        <form action="{% url 'add-expense' %}" method="POST">
-            {% include 'partials/_messages.html' %}
-        {% csrf_token %}
-            <div class="form-group">
-                <label for="">Category</label>
-                <select class="form-control" name="category" id="">
-                    {% for category in categories %}
-                        <option name="category" value="{{category.name}}">{{category.name}}</option>
-                    {% endfor %}
-                    
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="">Description</label>
-                <input type="text" class="form-control form-control-sm" value="{{values.description}}" name="description">
-            </div>
-            
-            <div class="form-group">
-                <label for="">Amount</label>
-                <input type="number" class="form-control form-control-sm" value="{{values.amount}}" name="amount">
-            </div>
-            <div class="form-group">
-                <label for="">Date of Expense</label>
-                <input type="date" class="form-control form-control-sm" value="{{values.date}}" name="date">
-            </div>
-            <input type="submit" value="Submit" class="btn btn-secondary btn-block btn-lg"/>
-        </form>
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'add-expense' %}" method="POST">
+                {% include 'partials/_messages.html' %}
+            {% csrf_token %}
+                <div class="form-group">
+                    <label for="">Category</label>
+                    <select class="form-control" name="category" id="">
+                        {% for category in categories %}
+                            <option name="category" value="{{category.name}}">{{category.name}}</option>
+                        {% endfor %}
+                        
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="">Description</label>
+                    <input type="text" class="form-control form-control-sm" value="{{values.description}}" name="description">
+                </div>
+                
+                <div class="form-group">
+                    <label for="">Amount</label>
+                    <input type="number" class="form-control form-control-sm" value="{{values.amount}}" name="amount">
+                </div>
+                <div class="form-group">
+                    <label for="">Date of Expense</label>
+                    <input type="date" class="form-control form-control-sm" value="{{values.date}}" name="date">
+                </div>
+                <input type="submit" value="Submit" class="btn btn-secondary btn-block btn-lg"/>
+            </form>
+        </div>
     </div>
-</div>
 
     
 </div>
     
 
 {% endblock %}
-<h1>Add Expenses</h1>
