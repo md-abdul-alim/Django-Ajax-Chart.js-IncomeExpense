@@ -12,6 +12,7 @@ from userpreferences.models import Currency
 # Create your views here.
 
 
+@login_required(login_url='login')
 def search_expenses(request):
     if request.method == 'POST':
         search_str = json.loads(request.body).get('searchText')
@@ -45,6 +46,7 @@ def dashboard(request):
     return render(request, 'expenses/dashboard.html', context)
 
 
+@login_required(login_url='login')
 def add_expense(request):
     categories = Category.objects.all()
     context = {
@@ -80,6 +82,7 @@ def add_expense(request):
     return render(request, 'expenses/add_expense.html', context)
 
 
+@login_required(login_url='login')
 def expense_update(request, id):
     expense = Expense.objects.get(pk=id)
     categories = Category.objects.all()
@@ -119,6 +122,7 @@ def expense_update(request, id):
         return redirect('expenses')
 
 
+@login_required(login_url='login')
 def expense_delete(request, id):
     expense = Expense.objects.get(pk=id)
     expense.delete()

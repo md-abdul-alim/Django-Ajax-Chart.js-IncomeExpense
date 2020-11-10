@@ -1,3 +1,4 @@
+from decimal import Context
 from email_validator import validate_email, EmailNotValidError
 from validate_email import validate_email
 from django.http import request
@@ -13,7 +14,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
-
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 from .utils import account_activation_token
 # Create your views here.
@@ -56,11 +57,6 @@ class RegistrationView(View):
 
     def post(self, request):
 
-        # messages.success(request, 'Success Registration')submit-btn
-        # messages.warning(request, 'Success Registration warning')
-        # messages.info(request, 'Success Registration info')
-        # messages.error(request, 'Success Registration error')
-
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
@@ -83,20 +79,22 @@ class RegistrationView(View):
                 user.is_active = False
                 user.save()
 
-                # path_to_view
-                # - getting domain we are on
-                # - relative url to verification
-                # - encode uid
-                # - token
+                # email_body = {
+                #     'user': user,
+                #     'domain': get_current_site(request).domain,
+                #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                #     'token': account_activation_token.make_token(user),
+                # }
                 uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
                 domain = get_current_site(request).domain
                 link = reverse('activate', kwargs={
                                'uidb64': uidb64, 'token': account_activation_token.make_token(user)})
                 activate_url = 'http://'+domain+link
 
+                email_subject = "Activate your account"
                 email_body = 'Hi '+user.username + \
                     '! Please use this link to verify your account\n' + activate_url
-                email_subject = "Activate your account"
+
                 # https://docs.djangoproject.com/en/3.1/topics/email/#emailmessage-objects
                 email = EmailMessage(
                     email_subject,
@@ -170,3 +168,63 @@ def logoutView(request):
     logout(request)
     messages.success(request, 'You have been logged out')
     return redirect('login')
+
+
+class PasswordReset(View):
+    def get(self, request):
+
+        return render(request, 'authentication/reset-password.html')
+
+    def post(self, request):
+        email = request.POST['email']
+        user = User.objects.filter(email=email)
+        Context = {
+            'values': request.POST
+        }
+        if not validate_email(email):
+            messages.error(request, 'Please insert a valid email')
+            return render(request, 'authentication/reset-password.html', Context)
+        else:
+
+            if user.exists():
+                email_contents = {
+                    'user': user[0],
+                    'domain': get_current_site(request).domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user[0].pk)),
+                    'token': PasswordResetTokenGenerator().make_token(user[0]),
+                }
+
+                link = reverse('set-new-password', kwargs={
+                    'uidb64': email_contents['uid'], 'token': email_contents['token']})
+                reset_url = 'http://'+email_contents['domain']+link
+
+                email_subject = "Password reset instructions"
+                email_body = 'Hi there, Please click to this link below to reset your password\n' + reset_url
+
+                # https://docs.djangoproject.com/en/3.1/topics/email/#emailmessage-objects
+                email = EmailMessage(
+                    email_subject,
+                    email_body,
+                    'alim.abdul.5915@gmail.com',
+                    [email],
+                )
+                email.send(fail_silently=False)
+                messages.success(
+                    request, 'We have sent you an email to reset your password.')
+                return render(request, 'authentication/reset-password.html')
+
+
+class CompletePasswordReset(View):
+    def get(self, request, uidb64, token):
+        context = {
+            'uidb64': uidb64,
+            'token': token
+        }
+        return render(request, 'authentication/set-new-password.html', context)
+
+    def post(self, request, uidb64, token):
+        context = {
+            'uidb64': uidb64,
+            'token': token
+        }
+        return render(request, 'authentication/set-new-password.html', context)
