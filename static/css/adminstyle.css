@@ -1,0 +1,37 @@
+#header {
+
+    background: rgb(0, 62, 69);
+    color: #ffc;
+   
+}
+#branding h1{
+    color: #b576c2;
+}
+div.breadcrumbs {
+    background: #c579c8;
+    padding: 10px 40px;
+    border: none;
+    font-size: 14px;
+    color: #50ff2d;
+    text-align: left;
+}
+
+
+.login .submit-row{
+    padding: 0px !important;
+}
+
+input[type=submit], input[type=button], .submit-row input {
+    width: 100%;
+    background: rgb(238, 8, 238);
+}
+
+.module h2, .module caption, .inline-group h2 {
+    margin: 0;
+    padding: 8px;
+    font-weight: 400;
+    font-size: 13px;
+    text-align: right;
+    background: #1ae213;
+    color: #fff;
+}
