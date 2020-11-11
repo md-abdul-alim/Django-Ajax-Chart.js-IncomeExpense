@@ -15,6 +15,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+import threading
 
 from .utils import account_activation_token
 # Create your views here.
@@ -36,6 +37,14 @@ class UsernameValidationView(View):
 # this is for froguction: pip install email-validator #https://pypi.org/project/email-validator/
 #from email_validator import validate_email, EmailNotValidError
 # this is for api test: pip install validate_email #https://pypi.org/project/validate_email/#description
+
+class EmailThread(threading.Thread):
+    def __init__(self, email):
+        self.email = email
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.email.send(fail_silently=False)
 
 
 class EmailValidationView(View):
@@ -102,8 +111,10 @@ class RegistrationView(View):
                     'alim.abdul.5915@gmail.com',
                     [email],
                 )
-                email.send(fail_silently=False)
-                messages.success(request, 'Account created successfully.')
+                # email.send(fail_silently=False) #or
+                EmailThread(email).start()
+                messages.success(
+                    request, 'Account created successfully.Please check email for verification.')
                 return render(request, 'authentication/register.html')
 
         return render(request, 'authentication/register.html')
@@ -148,16 +159,16 @@ class LoginView(View):
                     messages.success(request, 'Welcome, ' +
                                      user.username + ' your are now logged in')
                     return redirect('expenses')
-
-                # if user is not active
+                else:
+                    # if user is not active
+                    messages.error(
+                        request, 'Account is not activate, please check your email')
+                    return render(request, 'authentication/login.html')
+            else:
+                # if user is not registered
                 messages.error(
-                    request, 'Account is not activate, please check your email')
+                    request, 'Username or Password does not match.')
                 return render(request, 'authentication/login.html')
-
-            # if user is not registered
-            messages.error(
-                request, 'Username or Password does not match.')
-            return render(request, 'authentication/login.html')
 
         # if user is not registered
         messages.error(request, 'Please fill all fields')
@@ -208,9 +219,14 @@ class PasswordReset(View):
                     'alim.abdul.5915@gmail.com',
                     [email],
                 )
-                email.send(fail_silently=False)
+                # email.send(fail_silently=False) #or
+                EmailThread(email).start()
                 messages.success(
                     request, 'We have sent you an email to reset your password.')
+                return redirect('login')
+            else:
+                messages.success(
+                    request, 'This email is not registered')
                 return render(request, 'authentication/reset-password.html')
 
 
