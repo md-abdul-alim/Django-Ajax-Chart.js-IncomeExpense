@@ -1,5 +1,6 @@
 from django.core.checks import messages
 from django.http import request
+from django.http import response
 from expenses.models import Category
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
@@ -7,9 +8,18 @@ from django.contrib import messages
 from .models import Category, Expense
 from django.core.paginator import Paginator
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from userpreferences.models import Currency
 import datetime
+import csv
+import xlwt
+
+'''
+from django.template.loader import render_to_string
+from weasyprint import html
+import tempfile
+from django.db.models import Sum
+'''
 # Create your views here.
 
 
@@ -164,3 +174,82 @@ def expense_category_summary(request):
 
 def stats_view(request):
     return render(request, 'expenses/stats.html')
+
+
+def export_csv(request):
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename = Expenses' + \
+        str(datetime.datetime.now())+'.csv'
+    writer = csv.writer(response)
+    # this will be header
+    writer.writerow(['Category', 'Description', 'Amount', 'Date'])
+
+    expenses = Expense.objects.filter(owner=request.user)
+
+    # this will be data
+    for expense in expenses:
+        writer.writerow([expense.category, expense.description,
+                         expense.amount, expense.date])
+    return response
+
+# https://xlwt.readthedocs.io/en/latest/installation.html
+# pip install xlwt
+
+
+def export_excel(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename = Expenses' + \
+        str(datetime.datetime.now())+'.xls'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Expenses')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    columns = ['Category', 'Description', 'Amount', 'Date']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    font_style = xlwt.XFStyle()
+    rows = Expense.objects.filter(owner=request.user).values_list(
+        'category', 'description', 'amount', 'date')
+
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, str(row[col_num]), font_style)
+
+    wb.save(response)
+    return response
+
+# pip install WeasyPrint
+# https://pypi.org/project/WeasyPrint/#description
+
+
+# Not completed
+# def export_pdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename = Expenses' + \
+        str(datetime.datetime.now())+'.pdf'
+
+    response['Content-Transfer-Encoding'] = 'binary'
+
+    html_string = render_to_string(
+        'expenses/pdf-output.html', {'expenses': [], 'total': 0})
+
+    html = html(string=html_string)
+    result = html.write_pdf()
+
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(request)
+        output.flush()
+
+        output = open(output.name, 'rb')
+        response.write(output.read())
+
+    return response
+
+
+def export_pdf(request):
+    pass
